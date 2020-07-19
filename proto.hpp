@@ -68,7 +68,7 @@ inline size_t decode_varint(const void* data, size_t length, uint64_t& result)
   while (i < _max)
   {
     auto c = _data[i];
-    r += (c & 0x7F) << (i * 7);
+    r += uint64_t(c & 0x7F) << (i * 7);
     ++i;
     if (0 == (c & 0x80))
     {
