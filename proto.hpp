@@ -581,7 +581,8 @@ public:
     {
       if (id == f.id_) return f;
     }
-    return message{};
+    message tmp{};
+    return tmp;
   }
 
   message& operator[](int id) { return this->id(id); }
