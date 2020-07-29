@@ -417,15 +417,15 @@ public:
   ////////////////////////////////////////////////////////////
   void append_child(const message& f)
   {
-    // get from childs
-    auto& _field = this->id(f.id_);
-
     // id not exits, append
-    if (!_field)
+    if (!this->has(f.id_))
     {
       childs_.push_back(f);
       return;
     }
+
+    // get from childs
+    auto& _field = this->id(f.id_);
 
     // else id exits, repeat field
 
@@ -463,15 +463,15 @@ public:
 
   void append_child(message&& f)
   {
-    // get from childs
-    auto& _field = this->id(f.id_);
-
     // id not exits, append
-    if (!_field)
+    if (!this->has(f.id_))
     {
       childs_.emplace_back(std::move(f));
       return;
     }
+
+    // get from childs
+    auto& _field = this->id(f.id_);
 
     // else id exits, repeat field
 
@@ -566,13 +566,19 @@ public:
 
   message& at(size_t index)
   {
-    static message _undefined;
     for (auto& f : childs_)
     {
       if (0 == index) return f;
       --index;
     }
-    return _undefined;
+    // if not found, insert pad value first
+    while (index > 0) {
+      childs_.emplace_back(message{type_undefined, 0});
+      --index;
+    }
+    // insert it at index
+    childs_.emplace_back(message{type_undefined, 0});
+    return childs_.back();
   }
 
   message& id(int id)
@@ -581,8 +587,9 @@ public:
     {
       if (id == f.id_) return f;
     }
-    message tmp{};
-    return tmp;
+    // if not found, insert it
+    childs_.emplace_back(message{type_undefined, id});
+    return childs_.back();
   }
 
   message& operator[](int id) { return this->id(id); }
